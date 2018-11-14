@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  description: A simple Webhook reverse proxy.
+  version: 1.0.0
+  title: Captain Hook [External API]
+  contact:
+    email: hello@cerinuts.io
+  license:
+    name: MIT
+    url: 'http://www.github.com/cerinuts/captainhook/LICENSE'
+tags:
+  - name: hooks
+    description: Manage your hooks
+  - name: clients
+    description: Manage your clients
+paths:
+  /v1/hooks:
+    get:
+      tags:
+        - hooks
+      summary: Get all hooks for your client
+      description: Returns the identifier and urls for all active webhooks for this client
+      operationId: getHooks
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hook'
+        '403':
+          description: No client matched the secret
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer: []
+  /v1/hooks/{identifier}:
+    post:
+      tags:
+        - hooks
+      summary: Add a new webhook
+      description: Add a new webhook to your client
+      operationId: addHook
+      parameters:
+        - in: path
+          name: identifier
+          schema:
+            type: string
+          description: The identifier of the hook to create
+          required: true
+      responses:
+        '201':
+          description: successfully created the hook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hook'
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer: []
+    delete:
+      tags:
+        - hooks
+      summary: Delete a hook
+      description: Delete a Webhook from your client
+      operationId: delHook
+      parameters:
+        - in: path
+          name: identifier
+          schema:
+            type: string
+          description: The identifier of the hook to delete
+          required: true
+      responses:
+        '400':
+          description: Invalid Identifier format supplied
+        '403':
+          description: No client matched the secret
+        '404':
+          description: Hook not found
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer: []
+  /v1/connect:
+    get:
+      tags:
+        - clients
+      summary: The URL for clients to connect to
+      description: This endpoint offers a websocket connection for clients to receive their webhooks
+      operationId: connect
+      responses:
+        '101':
+          description: Upgrade to websocket connection. HTTP/2 only
+        '307':
+          description: Redirects the client to the websocket connection
+        '400':
+          description: The client does not support websockets
+        '500':
+            description: internal server error
+            content:
+              '*/*':
+                schema:
+                  $ref: '#/components/schemas/Error'
+      security:
+        - Bearer: []
+  /h/uuid:
+    post:
+      tags:
+       - extern
+      summary: The URL to call for external services
+      description: This is the callback url for external webhook publishers. The UUID determines which application will receive the webhook
+      operationId: call
+      responses:
+        '200':
+          description: Webhook was passed successfully
+        '502':
+          description: There is no client for this uuid
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+externalDocs:
+  description: Find out more
+  url: 'http://www.github.com/cerinuts/captainhook/README.md'
+servers:
+  - url: 'http://localhost:8080/'
+  - url: 'https://localhost:8082/'
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    Hook:
+      type: object
+      properties:
+        identifier:
+          type: string
+          format: string
+        url:
+          type: string
+          format: string
+        uuid:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        lastCall:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          format: string

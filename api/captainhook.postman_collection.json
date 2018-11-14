@@ -1,0 +1,374 @@
+{
+	"info": {
+		"_postman_id": "571971b2-835c-444c-b2d6-1c3b66f56df0",
+		"name": "captainhook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "internal",
+			"item": [
+				{
+					"name": "/v1/clients/:name",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{inturl}}/v1/clients/:name",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"v1",
+								"clients",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/clients/:name",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{inturl}}/v1/clients/:name",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"v1",
+								"clients",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/clients/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{inturl}}/v1/clients/",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"v1",
+								"clients",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/clients/:name",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{inturl}}/v1/clients/:name",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"v1",
+								"clients",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/hookByUUID/:uuid",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{inturl}}/v1/hookByUUID/:uuid",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"v1",
+								"hookByUUID",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/hooks/:client/:identifier",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{inturl}}/v1/hooks/:client/:identifier",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"v1",
+								"hooks",
+								":client",
+								":identifier"
+							],
+							"variable": [
+								{
+									"key": "client",
+									"value": "test"
+								},
+								{
+									"key": "identifier",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/version",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{inturl}}/version",
+							"protocol": "http",
+							"host": [
+								"{{inturl}}"
+							],
+							"path": [
+								"version"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "external",
+			"item": [
+				{
+					"name": "/v1/hooks/:identifier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "test:abc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{exturl}}/v1/hooks/:identifier",
+							"protocol": "http",
+							"host": [
+								"{{exturl}}"
+							],
+							"path": [
+								"v1",
+								"hooks",
+								":identifier"
+							],
+							"variable": [
+								{
+									"key": "identifier",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/hooks",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "test:abc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{exturl}}/v1/hooks",
+							"protocol": "http",
+							"host": [
+								"{{exturl}}"
+							],
+							"path": [
+								"v1",
+								"hooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/hooks/:identifier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "test:abc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{exturl}}/v1/hooks/:identifier",
+							"protocol": "http",
+							"host": [
+								"{{exturl}}"
+							],
+							"path": [
+								"v1",
+								"hooks",
+								":identifier"
+							],
+							"variable": [
+								{
+									"key": "identifier",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/h/:uuid",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "abc"
+						},
+						"url": {
+							"raw": "http://{{exturl}}/h/:uuid",
+							"protocol": "http",
+							"host": [
+								"{{exturl}}"
+							],
+							"path": [
+								"h",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/connect",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "test:abc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{exturl}}/v1/connect",
+							"protocol": "http",
+							"host": [
+								"{{exturl}}"
+							],
+							"path": [
+								"v1",
+								"connect"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

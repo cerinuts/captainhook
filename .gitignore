@@ -1,0 +1,6 @@
+*.exe
+server/db
+server.yaml
+*.log
+*.crt
+*.key

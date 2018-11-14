@@ -1,0 +1,12 @@
+# The hostname the captainhook server should bind the external API to. The internal API will always bind to 127.0.0.1
+Host: '127.0.0.1'
+# The port the external API should bind to. HTTP only. If SSL is configured, this port will redirect to the HTTPS port
+ExternalPort: 12840
+# The port the external API should bind to for HTTPS
+ExternalSSLPort: 12842
+# The port the internal api should bind to
+InternalPort: 12841
+# The SSL certificate file for the server. Leave empty if you want to run HTTP only.
+SSLCertificate: 'server.crt'
+# The SSL key file. Leave empty if you want to run HTTP only.
+SSLKey: 'server.key'

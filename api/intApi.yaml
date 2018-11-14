@@ -1,0 +1,255 @@
+openapi: 3.0.0
+info:
+  description: A simple Webhook reverse proxy. The internal API is used to manage your CaptainHook instance and is only accessible on localhost. We recommend using the CaptainHook CLI.
+  version: 1.0.0
+  title: Captain Hook [Internal API]
+  contact:
+    email: hello@cerinuts.io
+  license:
+    name: MIT
+    url: 'http://www.github.com/cerinuts/captainhook/LICENSE'
+tags:
+  - name: hooks
+    description: Manage your hooks
+  - name: clients
+    description: Manage your clients
+  - name: version
+paths:
+  /version:
+    get:
+      tags: 
+        - version 
+      summary: Get the CaptainHook version
+      description: Retrieve the CaptainHook version running on the server
+      operationId: getVersion
+      responses:
+        '200':
+          description: The server version
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: CaptainHook 0.1.0
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/clients:
+    get:
+      tags:
+        - clients
+      summary: Get all clients
+      description: Returns all the clients and some information about them
+      operationId: getClients
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clients'
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/clients/{name}:
+    post:
+      tags:
+        - clients
+      summary: Add a new client
+      description: Add a new captainhook client
+      operationId: addClient
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          description: The name of the new client
+          required: true
+      responses:
+        '200':
+          description: client was created successfully
+          content:
+            text/plain: 
+              schema: 
+                type: string
+                example: test:abc
+        '400':
+          description: client already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example: {"message": "A client with this name already exists"}
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - clients
+      summary: Generate a new secret for the client
+      description: If a secret got lost or compromised, generate a new one. This will invalidate the old secret
+      operationId: renewSecret
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          description: The name of the client to generate a new secret for
+          required: true
+      responses:
+        '200':
+          description: secret was regenerated successfully
+          content:
+            text/plain: 
+              schema: 
+                type: string
+                example: test:abc
+        '404':
+          description: client not found
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - clients
+      summary: Delete a client
+      description: Deletes a client and all its webhooks
+      operationId: delClient
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          description: The name of the client to delete
+          required: true
+      responses:
+        '200':
+          description: client was deleted
+        '404':
+          description: client not found
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/hookByUUID/:uuid:
+    delete:
+      tags:
+        - hooks
+      summary: Delete any hook
+      description: Deletes any webhook without knowing the client
+      operationId: delHook
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+          description: The uuid of the hook to delete
+          required: true
+      responses:
+        '200':
+          description: hook was deleted
+        '404':
+          description: hook not found
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/hooks/:client/:identifier:
+    put:
+      tags:
+        - hooks
+      summary: Add a new hook to a client
+      description: Add any hook to any client without authorization
+      operationId: addHook
+      parameters:
+        - in: path
+          name: client
+          schema:
+            type: string
+          description: The client name the hook should be added to
+          required: true
+        - in: path
+          name: identifier
+          schema:
+            type: string
+          description: The identifier of the new hook
+          required: true
+      responses:
+        '201': 
+          description: created the hook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hook'
+        '500':
+          description: internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+externalDocs:
+  description: Find out more
+  url: 'http://www.github.com/cerinuts/captainhook/README.md'
+servers:
+  - url: 'https://localhost:12841/'
+components:
+  schemas:
+    Hook:
+      type: object
+      properties:
+        identifier:
+          type: string
+          format: string
+        url:
+          type: string
+          format: string
+        uuid:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        lastCall:
+          type: string
+          format: date-time
+    Client:
+      type: object
+      properties:
+        name:
+          type: string
+          format: string
+        createdAt:
+          type: string
+          format: date-time
+        lastAction:
+          type: string
+          format: date-time
+        hooks:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Hook'
+    Clients:
+      type: array
+      items:
+        $ref: '#/components/schemas/Client'
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          format: string
