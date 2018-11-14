@@ -78,16 +78,21 @@ func setupInternalRouter(internalPort int, server *Server) {
 	// generate a new secret in case the old one is lost
 	intRouter.PATCH(ClientPath+"/:name", func(c *gin.Context) {
 		clientname := c.Param("name")
-		if server.Clients[clientname] == nil {
-			c.Status(http.StatusNotFound)
-			return
+		secret, err := server.RegenerateClientSecret(clientname)
+		if err != nil {
+			switch err.(type) {
+			case *ErrClientNotExists:
+				{
+					c.JSON(http.StatusNotFound, errorToStruct(err))
+					return
+				}
+			default:
+				{
+					c.JSON(http.StatusInternalServerError, errorToStruct(err))
+					return
+				}
+			}
 		}
-
-		secret, err := server.Clients[clientname].generateSecret()
-		if err != nil{
-			c.JSON(http.StatusInternalServerError, errorToStruct(err))
-		}
-		server.DB.Store(server.Clients[clientname])
 		c.String(http.StatusOK, secret)
 	})
 

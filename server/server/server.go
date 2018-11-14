@@ -187,6 +187,24 @@ func (s *Server) HandleHook(uuid string, req *http.Request) error {
 	return s.DB.Store(s.Hooks[uuid].client)
 }
 
+func (s *Server) RegenerateClientSecret(clientname string) (string, error) {
+	if s.Clients[clientname] == nil {
+		return "", &ErrClientNotExists{Name: clientname}
+	}
+
+	secret, err := s.Clients[clientname].generateSecret()
+	if err != nil {
+		return "", err
+	}
+
+	err = s.DB.Store(s.Clients[clientname])
+	if err != nil {
+		return "", err
+	}
+
+	return secret, nil
+}
+
 func (s *Server) validateClient(secret string) *Client {
 	split := strings.Split(secret, ":")
 	if len(split) != 2 {
