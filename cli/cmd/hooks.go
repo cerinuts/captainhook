@@ -31,6 +31,10 @@ var addHookCommand = &cobra.Command{
 	Short: "Add a new Hook",
 	Long:  `Add a new CaptainHook Webhook`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			fmt.Print("Not enough arguments (clientname, hookidentifier)")
+			return
+		}
 		fmt.Print(addHook(args[0], args[1]))
 	},
 }
@@ -40,6 +44,10 @@ func addHook(clientname, hookIdentifier string) string {
 	hook := new(server.Webhook)
 	err := json.Unmarshal([]byte(body), &hook)
 	if err != nil {
+		alreadyExists := &server.ErrHookAlreadyExists{Identifier: hookIdentifier}
+		if body == alreadyExists.Error() {
+			return body
+		}
 		log.Print(err.Error())
 		return "Could not read the server's answer"
 	}

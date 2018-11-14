@@ -59,7 +59,7 @@ func setupInternalRouter(internalPort int, server *Server) {
 		secret, err := server.AddClient(clientname)
 		if err != nil {
 			switch err.(type) {
-			case *ErrClientExists:
+			case *ErrClientAlreadyExists:
 				{
 					c.JSON(http.StatusBadRequest, errorToStruct(err))
 					return
@@ -124,8 +124,18 @@ func setupInternalRouter(internalPort int, server *Server) {
 		identifier := c.Param("identifier")
 		hook, err := server.AddHook(c.Param("client"), identifier)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, errorToStruct(err))
-			return
+			switch err.(type) {
+			case *ErrHookAlreadyExists:
+				{
+					c.JSON(http.StatusBadRequest, errorToStruct(err))
+					return
+				}
+			default:
+				{
+					c.JSON(http.StatusInternalServerError, errorToStruct(err))
+					return
+				}
+			}
 		}
 
 		c.JSON(http.StatusCreated, hook)
@@ -189,8 +199,18 @@ func setupExternalRouter(hostname string, extPort, extSSLPort int, server *Serve
 			identifier := c.Param("identifier")
 			hook, err := server.AddHook(client.Name, identifier)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, errorToStruct(err))
-				return
+				switch err.(type) {
+				case *ErrHookAlreadyExists:
+					{
+						c.JSON(http.StatusBadRequest, errorToStruct(err))
+						return
+					}
+				default:
+					{
+						c.JSON(http.StatusInternalServerError, errorToStruct(err))
+						return
+					}
+				}
 			}
 
 			c.JSON(http.StatusCreated, hook)
@@ -204,8 +224,18 @@ func setupExternalRouter(hostname string, extPort, extSSLPort int, server *Serve
 			identifier := c.Param("identifier")
 			err := server.DeleteHook(client.Name, identifier)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, errorToStruct(err))
-				return
+				switch err.(type) {
+				case *ErrHookNotExists:
+					{
+						c.JSON(http.StatusNotFound, errorToStruct(err))
+						return
+					}
+				default:
+					{
+						c.JSON(http.StatusInternalServerError, errorToStruct(err))
+						return
+					}
+				}
 			}
 
 			c.Status(http.StatusOK)

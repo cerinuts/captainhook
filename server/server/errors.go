@@ -2,12 +2,12 @@ package server
 
 import "strconv"
 
-type ErrClientExists struct {
+type ErrClientAlreadyExists struct {
 	Name string
 }
 
-func (e *ErrClientExists) Error() string {
-	return "A client with the name " + e.Name + " already exists"
+func (e *ErrClientAlreadyExists) Error() string {
+	return "A client with the name '" + e.Name + "' already exists"
 }
 
 type ErrClientNotExists struct {
@@ -15,7 +15,15 @@ type ErrClientNotExists struct {
 }
 
 func (e *ErrClientNotExists) Error() string {
-	return "A client with the name " + e.Name + " does not exist"
+	return "A client with the name '" + e.Name + "' does not exist"
+}
+
+type ErrHookAlreadyExists struct {
+	Identifier string
+}
+
+func (e *ErrHookAlreadyExists) Error() string {
+	return "Hook with identifier '" + e.Identifier + "' already exists"
 }
 
 type ErrHookNotExists struct {
@@ -23,7 +31,7 @@ type ErrHookNotExists struct {
 }
 
 func (e *ErrHookNotExists) Error() string {
-	return "Hook " + e.Identifier + " not found"
+	return "Hook '" + e.Identifier + "' not found"
 }
 
 type ErrInvalidClientName struct {
@@ -31,7 +39,7 @@ type ErrInvalidClientName struct {
 }
 
 func (e *ErrInvalidClientName) Error() string {
-	return "Clientname " + e.Name + " contains '" + delimeter + "' and is invalid"
+	return "Clientname '" + e.Name + "' contains '" + delimeter + "' and is invalid"
 }
 
 type ErrSecretGenerationFailed struct {

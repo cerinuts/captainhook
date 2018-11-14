@@ -74,7 +74,7 @@ func (s *Server) AddClient(name string) (string, error) {
 	}
 
 	if s.Clients[name] != nil {
-		return "", &ErrClientExists{Name: name}
+		return "", &ErrClientAlreadyExists{Name: name}
 	}
 
 	c := &Client{
@@ -115,6 +115,10 @@ func (s *Server) AddHook(clientname, identifier string) (*Webhook, error) {
 
 	if s.Clients[clientname] == nil {
 		return nil, &ErrClientNotExists{Name: clientname}
+	}
+
+	if s.Clients[clientname].Hooks[identifier] != nil {
+		return nil, &ErrHookAlreadyExists{Identifier: identifier}
 	}
 
 	url, uuid, err := s.generateURL()
