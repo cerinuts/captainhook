@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -35,7 +36,7 @@ func (c *Client) generateSecret() (string, error) {
 		return "", err
 	}
 
-	s := c.Name + ":" + string(b)
+	s := c.Name + ":" + base64.URLEncoding.EncodeToString(b)
 	c.Secret = s
 
 	return s, nil
