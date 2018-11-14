@@ -1,6 +1,7 @@
 package server
 
 import (
+	"crypto/sha256"
 	"net/http"
 	"strings"
 	"time"
@@ -84,7 +85,7 @@ func (s *Server) AddClient(name string) (string, error) {
 	}
 
 	secret, err := c.generateSecret()
-	if err == nil {
+	if err != nil {
 		return "", &ErrSecretGenerationFailed{Message: err.Error()}
 	}
 
@@ -198,7 +199,7 @@ func (s *Server) validateClient(secret string) *Client {
 
 	sec := s.Clients[split[0]].Secret
 	_ = sec
-	if s.Clients[split[0]].Secret != secret {
+	if string(s.Clients[split[0]].Secret) != string(sha256.New().Sum([]byte(secret))) {
 		return nil
 	}
 

@@ -137,7 +137,7 @@ func handleKeyValuePair(k, v string, clients map[string]*Client) error {
 	}
 	switch keysplit[1] {
 	case "Secret":
-		clients[name].Secret = v
+		clients[name].Secret = []byte(v)
 	case "CreatedAt":
 		t, err := time.Parse(time.RFC3339, v)
 		if err != nil {

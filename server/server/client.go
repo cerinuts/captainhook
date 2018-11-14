@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"log"
@@ -17,7 +18,7 @@ const secretByteLength = 32
 // Client contains the information and hooks of a registered client
 type Client struct {
 	Name       string              `json:"name"`
-	Secret     string              `json:"-"`
+	Secret     []byte              `json:"-"`
 	CreatedAt  time.Time           `json:"createdAt"`
 	LastAction time.Time           `json:"lastAction"`
 	Hooks      map[string]*Webhook `json:"hooks"`
@@ -37,7 +38,7 @@ func (c *Client) generateSecret() (string, error) {
 	}
 
 	s := c.Name + ":" + base64.URLEncoding.EncodeToString(b)
-	c.Secret = s
+	c.Secret = sha256.New().Sum([]byte(s))
 
 	return s, nil
 }
@@ -72,13 +73,11 @@ func (c *Client) MarshalJSON() ([]byte, error) {
 	_, h := hookMapToSlice(c.Hooks)
 	cli := struct {
 		Name       string     `json:"name"`
-		Secret     string     `json:"-"`
 		CreatedAt  time.Time  `json:"createdAt"`
 		LastAction time.Time  `json:"lastAction"`
 		Hooks      []*Webhook `json:"hooks"`
 	}{
 		c.Name,
-		c.Secret,
 		c.CreatedAt,
 		c.LastAction,
 		h,
@@ -91,7 +90,6 @@ func (c *Client) MarshalJSON() ([]byte, error) {
 func (c *Client) UnmarshalJSON(in []byte) error {
 	cli := struct {
 		Name       string     `json:"name"`
-		Secret     string     `json:"-"`
 		CreatedAt  time.Time  `json:"createdAt"`
 		LastAction time.Time  `json:"lastAction"`
 		Hooks      []*Webhook `json:"hooks"`
@@ -103,7 +101,6 @@ func (c *Client) UnmarshalJSON(in []byte) error {
 	}
 
 	c.Name = cli.Name
-	c.Secret = cli.Secret
 	c.CreatedAt = cli.CreatedAt
 	c.LastAction = cli.LastAction
 	c.Hooks = make(map[string]*Webhook)
