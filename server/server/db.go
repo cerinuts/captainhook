@@ -35,7 +35,7 @@ func Open(path string) *DB {
 	opts.ValueLogFileSize = 1024 * 1024
 	db, err := badger.Open(opts)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Can't open database %s", err.Error())
 	}
 
 	return &DB{
@@ -48,43 +48,50 @@ func (db *DB) Store(client *Client) error {
 	return db.bdb.Update(func(txn *badger.Txn) error {
 		err := txn.Set([]byte(client.Name+delimeter+"Secret"), []byte(client.Secret))
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 
 		err = txn.Set([]byte(client.Name+delimeter+"CreatedAt"), []byte(client.CreatedAt.Format(time.RFC3339)))
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 
 		err = txn.Set([]byte(client.Name+delimeter+"LastAction"), []byte(client.LastAction.Format(time.RFC3339)))
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 
 		for _, h := range client.Hooks {
 			err = txn.Set([]byte(client.Name+delimeter+"Hooks"+delimeter+h.Identifier+delimeter+"URL"), []byte(h.URL))
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 
 			err = txn.Set([]byte(client.Name+delimeter+"Hooks"+delimeter+h.Identifier+delimeter+"UUID"), []byte(h.UUID))
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 
 			err = txn.Set([]byte(client.Name+delimeter+"Hooks"+delimeter+h.Identifier+delimeter+"CreatedAt"), []byte(h.CreatedAt.Format(time.RFC3339)))
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 
 			err = txn.Set([]byte(client.Name+delimeter+"Hooks"+delimeter+h.Identifier+delimeter+"LastCall"), []byte(h.LastCall.Format(time.RFC3339)))
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 
 		}
 
-		return err
+		return nil
 	})
 }
 
@@ -102,6 +109,7 @@ func (db *DB) Load() (map[string]*Client, error) {
 				return handleKeyValuePair(string(k), string(v), clients)
 			})
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 		}
@@ -120,6 +128,7 @@ func (db *DB) Delete(clientName string) error {
 			k := item.Key()
 			err := txn.Delete(k)
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 		}
@@ -141,12 +150,14 @@ func handleKeyValuePair(k, v string, clients map[string]*Client) error {
 	case "CreatedAt":
 		t, err := time.Parse(time.RFC3339, v)
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 		clients[name].CreatedAt = t
 	case "LastAction":
 		t, err := time.Parse(time.RFC3339, v)
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 		clients[name].LastAction = t
@@ -163,12 +174,14 @@ func handleKeyValuePair(k, v string, clients map[string]*Client) error {
 		case "CreatedAt":
 			t, err := time.Parse(time.RFC3339, v)
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 			clients[name].Hooks[keysplit[2]].CreatedAt = t
 		case "LastCall":
 			t, err := time.Parse(time.RFC3339, v)
 			if err != nil {
+				log.Error(err)
 				return err
 			}
 			clients[name].Hooks[keysplit[2]].LastCall = t

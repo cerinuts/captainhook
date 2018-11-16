@@ -34,6 +34,7 @@ type Server struct {
 
 // NewServer creates a new CaptainHook Server
 func NewServer(host, port string) *Server {
+
 	return &Server{
 		Clients:  make(map[string]*Client),
 		Hooks:    make(map[string]*Webhook),
@@ -46,7 +47,7 @@ func NewServer(host, port string) *Server {
 func (s *Server) Load() {
 	cli, err := s.DB.Load()
 	if err != nil {
-		panic("Error reading database")
+		log.Fatalf("Error reading database: %s", err.Error())
 	}
 	s.Clients = cli
 }
@@ -70,11 +71,15 @@ func (s *Server) Run() {
 func (s *Server) AddClient(name string) (string, error) {
 
 	if strings.Contains(name, delimeter) {
-		return "", &ErrInvalidClientName{Name: name}
+		err := &ErrInvalidClientName{Name: name}
+		log.Error(err)
+		return "", err
 	}
 
 	if s.Clients[name] != nil {
-		return "", &ErrClientAlreadyExists{Name: name}
+		err := &ErrClientAlreadyExists{Name: name}
+		log.Error(err)
+		return "", err
 	}
 
 	c := &Client{
@@ -86,6 +91,7 @@ func (s *Server) AddClient(name string) (string, error) {
 
 	secret, err := c.generateSecret()
 	if err != nil {
+		log.Error(err)
 		return "", &ErrSecretGenerationFailed{Message: err.Error()}
 	}
 
@@ -98,7 +104,9 @@ func (s *Server) AddClient(name string) (string, error) {
 // RemoveClient will delete a client
 func (s *Server) RemoveClient(name string) error {
 	if s.Clients[name] == nil {
-		return &ErrClientNotExists{Name: name}
+		err := &ErrClientNotExists{Name: name}
+		log.Error(err)
+		return err
 	}
 
 	s.Clients[name].Destroy()
@@ -114,15 +122,20 @@ func (s *Server) RemoveClient(name string) error {
 func (s *Server) AddHook(clientname, identifier string) (*Webhook, error) {
 
 	if s.Clients[clientname] == nil {
-		return nil, &ErrClientNotExists{Name: clientname}
+		err := &ErrClientNotExists{Name: clientname}
+		log.Error(err)
+		return nil, err
 	}
 
 	if s.Clients[clientname].Hooks[identifier] != nil {
-		return nil, &ErrHookAlreadyExists{Identifier: identifier}
+		err := &ErrHookAlreadyExists{Identifier: identifier}
+		log.Error(err)
+		return nil, err
 	}
 
 	url, uuid, err := s.generateURL()
 	if err != nil {
+		log.Error(err)
 		return nil, &ErrCreatingUUID{Message: err.Error()}
 	}
 
@@ -145,11 +158,15 @@ func (s *Server) AddHook(clientname, identifier string) (*Webhook, error) {
 // DeleteHook removes the webhook identified by identifier from the given client
 func (s *Server) DeleteHook(clientname, identifier string) error {
 	if s.Clients[clientname] == nil {
-		return &ErrClientNotExists{Name: clientname}
+		err := &ErrClientNotExists{Name: clientname}
+		log.Error(err)
+		return err
 	}
 
 	if s.Clients[clientname].Hooks[identifier] == nil {
-		return &ErrHookNotExists{Identifier: identifier}
+		err := &ErrHookNotExists{Identifier: identifier}
+		log.Error(err)
+		return err
 	}
 
 	delete(s.Hooks, s.Clients[clientname].Hooks[identifier].UUID)
@@ -173,7 +190,9 @@ func (s *Server) DeleteHookByUUID(uuid string) error {
 
 	}
 
-	return &ErrHookNotExists{Identifier: uuid}
+	err := &ErrHookNotExists{Identifier: uuid}
+	log.Error(err)
+	return err
 }
 
 // HandleHook will proxy the http request sent by the 3rd party to the client this webhook belongs to
@@ -184,6 +203,7 @@ func (s *Server) HandleHook(uuid string, req *http.Request) error {
 
 	err := s.Hooks[uuid].Handle(req)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 
@@ -193,16 +213,20 @@ func (s *Server) HandleHook(uuid string, req *http.Request) error {
 
 func (s *Server) RegenerateClientSecret(clientname string) (string, error) {
 	if s.Clients[clientname] == nil {
-		return "", &ErrClientNotExists{Name: clientname}
+		err := &ErrClientNotExists{Name: clientname}
+		log.Error(err)
+		return "", err
 	}
 
 	secret, err := s.Clients[clientname].generateSecret()
 	if err != nil {
+		log.Error(err)
 		return "", err
 	}
 
 	err = s.DB.Store(s.Clients[clientname])
 	if err != nil {
+		log.Error(err)
 		return "", err
 	}
 
@@ -212,16 +236,19 @@ func (s *Server) RegenerateClientSecret(clientname string) (string, error) {
 func (s *Server) validateClient(secret string) *Client {
 	split := strings.Split(secret, ":")
 	if len(split) != 2 {
+		log.Infof("Clientsecretsplit length %d invalid", len(split))
 		return nil
 	}
 
 	if s.Clients[split[0]] == nil {
+		log.Infof("Client '%s' does not exist", split[0])
 		return nil
 	}
 
 	sec := s.Clients[split[0]].Secret
 	_ = sec
 	if string(s.Clients[split[0]].Secret) != string(sha256.New().Sum([]byte(secret))) {
+		log.Info("Clientsecret does not match")
 		return nil
 	}
 
@@ -233,6 +260,7 @@ func (s *Server) generateURL() (string, string, error) {
 
 	u4, err := uuid.NewV4()
 	if err != nil {
+		log.Error(err)
 		return "", "", err
 	}
 	return "http://" + s.hostname + ":" + s.port + "/h/" + u4.String(), u4.String(), nil

@@ -10,3 +10,5 @@ InternalPort: 12841
 SSLCertificate: 'server.crt'
 # The SSL key file. Leave empty if you want to run HTTP only.
 SSLKey: 'server.key'
+# Loglevel Trace, Debug, Info, Warning, Error, Fatal, Panic
+Loglevel: Trace

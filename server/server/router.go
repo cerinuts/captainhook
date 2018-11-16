@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -45,7 +44,8 @@ func SetupSSLAPI(hostname string, extPort, extSSLPort, intPort int, server *Serv
 }
 
 func setupInternalRouter(internalPort int, server *Server) {
-	intRouter := gin.Default()
+	intRouter := gin.New()
+	intRouter.Use(getGinLogger(), gin.Recovery())
 
 	// get all clients
 	intRouter.GET(ClientPath, func(c *gin.Context) {
@@ -58,8 +58,9 @@ func setupInternalRouter(internalPort int, server *Server) {
 		clientname := c.Param("name")
 		secret, err := server.AddClient(clientname)
 		if err != nil {
+			log.Error(err)
 			switch err.(type) {
-			case *ErrClientAlreadyExists:
+			case *ErrClientAlreadyExists, *ErrInvalidClientName:
 				{
 					c.JSON(http.StatusBadRequest, errorToStruct(err))
 					return
@@ -80,6 +81,7 @@ func setupInternalRouter(internalPort int, server *Server) {
 		clientname := c.Param("name")
 		secret, err := server.RegenerateClientSecret(clientname)
 		if err != nil {
+			log.Error(err)
 			switch err.(type) {
 			case *ErrClientNotExists:
 				{
@@ -101,6 +103,7 @@ func setupInternalRouter(internalPort int, server *Server) {
 		clientname := c.Param("name")
 		err := server.RemoveClient(clientname)
 		if err != nil {
+			log.Error(err)
 			switch err.(type) {
 			case *ErrClientNotExists:
 				{
@@ -124,6 +127,7 @@ func setupInternalRouter(internalPort int, server *Server) {
 		identifier := c.Param("identifier")
 		hook, err := server.AddHook(c.Param("client"), identifier)
 		if err != nil {
+			log.Error(err)
 			switch err.(type) {
 			case *ErrHookAlreadyExists:
 				{
@@ -145,12 +149,14 @@ func setupInternalRouter(internalPort int, server *Server) {
 	intRouter.DELETE(HookByUUIDPath+"/:uuid", func(c *gin.Context) {
 		uuid, err := url.QueryUnescape(c.Param("uuid"))
 		if err != nil {
+			log.Error(err)
 			c.JSON(http.StatusBadRequest, errorToStruct(err))
 			return
 		}
 
 		err = server.DeleteHookByUUID(uuid)
 		if err != nil {
+			log.Error(err)
 			switch err.(type) {
 			case *ErrHookNotExists:
 				{
@@ -175,6 +181,7 @@ func setupInternalRouter(internalPort int, server *Server) {
 	go func() {
 		err := intRouter.Run("127.0.0.1:" + strconv.Itoa(internalPort))
 		if err != nil {
+			log.Error(err)
 			log.Print(err)
 		}
 	}()
@@ -182,7 +189,8 @@ func setupInternalRouter(internalPort int, server *Server) {
 }
 
 func setupExternalRouter(hostname string, extPort, extSSLPort int, server *Server, certFile, keyFile string) {
-	extRouter := gin.Default()
+	extRouter := gin.New()
+	extRouter.Use(getGinLogger(), gin.Recovery())
 
 	// get all hooks for client
 	extRouter.GET(HookPath, func(c *gin.Context) {
@@ -199,6 +207,7 @@ func setupExternalRouter(hostname string, extPort, extSSLPort int, server *Serve
 			identifier := c.Param("identifier")
 			hook, err := server.AddHook(client.Name, identifier)
 			if err != nil {
+				log.Error(err)
 				switch err.(type) {
 				case *ErrHookAlreadyExists:
 					{
@@ -224,6 +233,7 @@ func setupExternalRouter(hostname string, extPort, extSSLPort int, server *Serve
 			identifier := c.Param("identifier")
 			err := server.DeleteHook(client.Name, identifier)
 			if err != nil {
+				log.Error(err)
 				switch err.(type) {
 				case *ErrHookNotExists:
 					{

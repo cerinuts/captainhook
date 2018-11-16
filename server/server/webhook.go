@@ -3,7 +3,6 @@ package server
 import (
 	"bufio"
 	"bytes"
-	"log"
 	"net/http"
 	"time"
 )
@@ -26,19 +25,19 @@ func (w *Webhook) Handle(req *http.Request) error {
 	writer := bufio.NewWriter(&b)
 	err := req.WriteProxy(writer)
 	if err != nil {
-		log.Print("Cloud not write request: " + err.Error())
+		log.Error("Cloud not write request: %s ", err.Error())
 		return err
 	}
 	err = writer.Flush()
 	if err != nil {
-		log.Print("Error flushing writer")
+		log.Error("Error flushing writer")
 		return err
 	}
 
 	for _, ws := range w.client.ws {
 		err = ws.Broadcast(b.Bytes())
 		if err != nil {
-			log.Print("Could not send to websocket")
+			log.Error("Could not send to websocket")
 		}
 	}
 
