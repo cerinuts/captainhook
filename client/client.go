@@ -4,7 +4,6 @@ This Package is part of "captainhook"
 It is licensed under the MIT License
 */
 
-
 package captainhook
 
 import (
