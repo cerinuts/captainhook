@@ -188,7 +188,6 @@ func setupInternalRouter(internalPort int, server *Server) {
 		err := intRouter.Run("127.0.0.1:" + strconv.Itoa(internalPort))
 		if err != nil {
 			log.Error(err)
-			log.Print(err)
 		}
 	}()
 

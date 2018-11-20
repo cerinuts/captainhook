@@ -96,6 +96,11 @@ func RunRequest(path, method string) string {
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		var intError InternalError
 		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Print(err.Error())
+			return "Error reading body"
+		}
+
 		err = json.Unmarshal(body, &intError)
 		if err != nil {
 			nerr := errors.New("Server responded with " + strconv.Itoa(resp.StatusCode))
