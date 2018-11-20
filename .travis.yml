@@ -2,4 +2,4 @@ language: go
 go:
   - "1.11"
 go_import_path: code.cerinuts.io/cerinuts/captainhook
-script: true
+script: go build -o ./server/captainhook ./server && go build -o ./cli/captainhook ./cli
