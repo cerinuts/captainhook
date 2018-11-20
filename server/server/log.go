@@ -14,6 +14,7 @@ import (
 
 var log *logrus.Logger
 
+// InitLogger initalizes the logger with some settings
 func InitLogger() {
 	log = logrus.New()
 	level, err := logrus.ParseLevel(viper.GetString("Loglevel"))

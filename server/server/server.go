@@ -44,6 +44,7 @@ func NewServer(host, port string) *Server {
 	}
 }
 
+// Load loads the initial database content
 func (s *Server) Load() {
 	cli, err := s.DB.Load()
 	if err != nil {
@@ -52,6 +53,7 @@ func (s *Server) Load() {
 	s.Clients = cli
 }
 
+// Stop stops the server
 func (s *Server) Stop() {
 	for _, c := range s.Clients {
 		for _, ws := range c.ws {
@@ -61,6 +63,7 @@ func (s *Server) Stop() {
 	s.DB.bdb.Close()
 }
 
+// Run blocks endlessly
 func (s *Server) Run() {
 	defer s.Stop()
 	c := make(chan int)
@@ -211,6 +214,7 @@ func (s *Server) HandleHook(uuid string, req *http.Request) error {
 	return s.DB.Store(s.Hooks[uuid].client)
 }
 
+// RegenerateClientSecret will recreate a secret for the given client and invalidate the old one
 func (s *Server) RegenerateClientSecret(clientname string) (string, error) {
 	if s.Clients[clientname] == nil {
 		err := &ErrClientNotExists{Name: clientname}

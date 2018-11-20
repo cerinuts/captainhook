@@ -13,11 +13,13 @@ const defaultDatabasePathWin = "./db"
 
 const delimeter = "."
 
+// DB is the database
 type DB struct {
 	bdb  *badger.DB
 	path string
 }
 
+// Open opens the database
 func Open(path string) *DB {
 
 	if path == "" {
@@ -44,6 +46,7 @@ func Open(path string) *DB {
 	}
 }
 
+// Store stores a client in the database
 func (db *DB) Store(client *Client) error {
 	return db.bdb.Update(func(txn *badger.Txn) error {
 		err := txn.Set([]byte(client.Name+delimeter+"Secret"), []byte(client.Secret))
@@ -95,6 +98,7 @@ func (db *DB) Store(client *Client) error {
 	})
 }
 
+// Load loads all clients in the database
 func (db *DB) Load() (map[string]*Client, error) {
 	clients := make(map[string]*Client)
 	err := db.bdb.View(func(txn *badger.Txn) error {
@@ -118,6 +122,7 @@ func (db *DB) Load() (map[string]*Client, error) {
 	return clients, err
 }
 
+// Delete deletes a client from the database
 func (db *DB) Delete(clientName string) error {
 	return db.bdb.Update(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)

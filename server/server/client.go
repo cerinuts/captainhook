@@ -68,6 +68,7 @@ func (c *Client) Destroy() {
 	}
 }
 
+// MarshalJSON marshals a client to the correct json representation
 func (c *Client) MarshalJSON() ([]byte, error) {
 	_, h := hookMapToSlice(c.Hooks)
 	cli := struct {
@@ -86,6 +87,7 @@ func (c *Client) MarshalJSON() ([]byte, error) {
 	return b, err
 }
 
+// UnmarshalJSON unmarshals the JSON representation of a client
 func (c *Client) UnmarshalJSON(in []byte) error {
 	cli := struct {
 		Name       string     `json:"name"`

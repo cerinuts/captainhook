@@ -15,14 +15,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//ApplicationName is the name of the application
 const ApplicationName = "CaptainHook CLI"
+
+//VersionMajor 0 means in development, >1 ensures compatibility with each minor version, but breakes with new major version
 const VersionMajor = "0"
+
+//VersionMinor introduces changes that require a new version number. If the major version is 0, they are likely to break compatibility
 const VersionMinor = "1"
+
+//VersionPatch introduces changes that require a new version number. Follows semver specs.
 const VersionPatch = "0"
+
+//FullVersion contains the full version of this package in a printable string
 const FullVersion = VersionMajor + "." + VersionMinor + "." + VersionPatch
 
 var serverAddress string
 
+// InternalError is any internal error
 type InternalError struct {
 	Message string `json:"message"`
 }
@@ -52,6 +62,7 @@ func Execute() {
 	}
 }
 
+// RunRequest runs a request to the server to given path with http method
 func RunRequest(path, method string) string {
 	u, err := url.Parse(serverAddress + path)
 

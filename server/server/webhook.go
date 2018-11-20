@@ -25,7 +25,7 @@ func (w *Webhook) Handle(req *http.Request) error {
 	writer := bufio.NewWriter(&b)
 	err := req.WriteProxy(writer)
 	if err != nil {
-		log.Error("Cloud not write request: %s ", err.Error())
+		log.Errorf("Cloud not write request: %s ", err.Error())
 		return err
 	}
 	err = writer.Flush()

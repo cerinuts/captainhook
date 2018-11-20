@@ -22,6 +22,7 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+// GetVersion gets the server version
 func GetVersion() string {
 	return RunRequest(server.ApplicationVersionPath, "GET")
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// InitConfig initializes the config with default values
 func InitConfig() {
 
 	viper.SetConfigName("server")
@@ -25,7 +26,7 @@ func InitConfig() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 
 	if !viper.GetBool("Debug") {
