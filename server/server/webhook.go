@@ -1,3 +1,9 @@
+/*
+Copyright (c) 2018 ceriath
+This Package is part of "captainhook"
+It is licensed under the MIT License
+*/
+
 package server
 
 import (
