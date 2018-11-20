@@ -1,0 +1,4 @@
+  language: go
+  go:
+    - "1.11"
+  go_import_path: code.cerinuts.io/cerinuts/captainhook
