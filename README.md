@@ -16,7 +16,7 @@ Simple Webhook reverse proxy server for all your services
 The CLI is self-documentend, just add the -h or --help option
 
 # API 
-Check /api for openapi specs and a postman request collection
+Check [/api](./api) for openapi specs and a postman request collection
 
 # Client Library
 [![GoDoc](https://godoc.org/github.com/cerinuts/captainhook/client?status.svg)](https://godoc.org/github.com/cerinuts/captainhook/client)
