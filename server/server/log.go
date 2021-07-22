@@ -21,7 +21,7 @@ import (
 var log *logrus.Logger
 
 // InitLogger initializes the logger with some settings
-func InitLogger() {
+func InitLogger(opts *badger.Options) badger.Options {
 	log = logrus.New()
 	level, err := logrus.ParseLevel(viper.GetString("Loglevel"))
 	if err != nil {
@@ -38,7 +38,7 @@ func InitLogger() {
 
 	badgerLog := log.WithField("subsystem", "Badger")
 
-	badger.SetLogger(badgerLog)
+	return opts.WithLogger(badgerLog)
 }
 
 func getGinLogger() gin.HandlerFunc {

@@ -13,7 +13,6 @@ import (
 
 func main() {
 	server.InitConfig()
-	server.InitLogger()
 
 	s := server.NewServer(viper.GetString("Host"), viper.GetString("ExternalPort"))
 	s.Load()

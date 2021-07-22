@@ -36,11 +36,12 @@ func Open(path string) *DB {
 		}
 	}
 
-	opts := badger.DefaultOptions
+	opts := badger.DefaultOptions("/tmp/badger")
 	opts.Dir = path
 	opts.ValueDir = path
 	opts.Truncate = true
 	opts.ValueLogFileSize = 1024 * 1024
+	opts = InitLogger(&opts)
 	db, err := badger.Open(opts)
 	if err != nil {
 		log.Fatalf("Can't open database %s", err.Error())
