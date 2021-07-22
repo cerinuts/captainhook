@@ -3,7 +3,7 @@ module code.cerinuts.io/cerinuts/captainhook/cli
 go 1.16
 
 require (
-	code.cerinuts.io/cerinuts/captainhook/server v0.0.0-20210722200416-84636868caea
+	code.cerinuts.io/cerinuts/captainhook/server v0.0.0-20210722202158-fb0e8bb340ff
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/go-playground/validator/v10 v10.7.0 // indirect
 	github.com/golang/glog v0.0.0-20210429001901-424d2337a529 // indirect
